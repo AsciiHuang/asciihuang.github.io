@@ -20,7 +20,7 @@
 					return Environment.getExternalStorageDirectory().getCanonicalPath() + File.separator + "Android" + File.separator + "data"
 							+ File.separator + context.getPackageName() + File.separator + "files";
 				} catch (IOException e) {
-					KKDebug.e("getDefaultSDCardPath " + Log.getStackTraceString(e));
+					Log.e("getDefaultSDCardPath " + Log.getStackTraceString(e));
 				}
 			}
 		}
