@@ -12,3 +12,45 @@
         <input id="clickMe" type="button" value="clickme" onclick="callApp();" />
     </body>
 </html>
+
+<!--
+public class MainActivity extends AppCompatActivity {
+
+    private WebView webView;
+
+    public String message;
+    public String mgmURL;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        webView = (WebView) findViewById(R.id.webview);
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setSupportZoom(true);
+        webSettings.setBuiltInZoomControls(true);
+        webSettings.setJavaScriptEnabled(true);
+
+        webView.addJavascriptInterface(new JsCallBack(), "ExtObj");
+        webView.loadUrl("https://asciihuang.github.io/External.html");
+    }
+
+    @Override
+    protected void onDestroy() {
+        startActivity(new Intent(MainActivity.this, MainActivity.class));
+        super.onDestroy();
+    }
+
+    private class JsCallBack
+    {
+        @JavascriptInterface
+        public void setMGMData(final String message, final String mgmURL)
+        {
+            MainActivity.this.message = message;
+            MainActivity.this.mgmURL = mgmURL;
+            Log.e("Callback", message + " :: " + mgmURL);
+        }
+    }
+}
+-->
