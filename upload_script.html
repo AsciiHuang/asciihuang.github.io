@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="tc">
+    <head>
+        <meta charset="UTF-8" />
+    </head>
+    <body>
+        <input type='file' name='upload_student_id[]' id='student_upload_item' class='upload_item'>
+        <input type='text' id='student_upload_input' class='upload_input' disabled>
+        <button type='button' id='student_upload_btn' class='upload_btn'>開啟檔案</button>
+        <img onclick = add_upload_button(); id = "add_upload_button_btn" style="with:18px;height:18px;margin-left: 0px;" src='https://ssl.kkbox.com/images/plus.png'>
+        <p>1. 上傳檔案類型限：*.jpg、*.jpeg、*.png、*.gif</p>
+        <p>2. 單一檔案容量限制：3MB</p>
+        <p>3. 一張學生證只能用來驗證一組帳號，並且限本人申請。</p>
+    <input type='submit' name='set_student_id' class='btn btn-primary btn-block' id='set_student_id' value='上傳'>
+
+<script>
+    $(document).ready(function() {
+        $("div.selected_lan").on("click", function() {
+            var hasActiveClass = $("div.select-box").hasClass("active");
+
+            if (hasActiveClass === false) {
+                var windowHeight = $(window).outerHeight();
+                var dropdownPosition = $(this).offset().top;
+                var dropdownHeight = 95; // dropdown height
+
+                if (dropdownPosition + dropdownHeight + 50 > windowHeight) {
+                    $("div.select-box").addClass("drop-up");
+                } else {
+                    $("div.select-box").removeClass("drop-up");
+                }
+
+                var currentUniversity = $(this).find('text').text().trim();
+
+                $.each($("ul.select-list li"), function() {
+                    var university = $(this).text().trim();
+                    if (university === currentUniversity)
+                        $(this).addClass("active");
+                    else
+                        $(this).removeClass("active");
+                });
+            }
+
+            $("div.select-box").toggleClass("active");
+        });
+
+        $("ul.select-list li").on("click", function() {
+            var university = $(this).html();
+            $("span.text").html(university);
+
+            var lang = $(this).data('value');
+            var url_str = document.location.toString();
+            if (url_str.search(/\/\?/i)==-1 && url_str.search(/.php\?/i)==-1) {
+                url_str += "?lang=" + lang;
+            } else {
+                var url_h = url_str.substring(0, url_str.search(/\?/i));
+                var url_b = url_str.substring(url_str.search(/\?/i) + 1, url_str.length);
+                var param_arr = url_b.split("&");
+                url_str = url_h + "?";
+                for (var i = 0; i < param_arr.length; i++) {
+                    if (param_arr[i].search(/lang\=/i) == -1)
+                        url_str += param_arr[i] + '&';
+                }
+                url_str += "lang=" + lang;
+            }
+            document.location.replace(url_str);
+
+            $("div.select-box").removeClass("active");
+        });
+
+        $("ul.select-list li").hover(function() {
+            $("ul.select-list li").removeClass("active");
+        });
+
+        $(document).click(function(event) {
+            if ($(event.target).closest("div.custom-select").length < 1) {
+                $("div.select-box").removeClass("active");
+            }
+        });
+
+        $(window).unload(function() {}); //避免safari上一頁動作暫存
+    });
+</script>
+
+
+        <script src="https://ssl.kkbox.com/js/util/loading.js"></script>
+
+                <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+        <script src="https://ssl.kkbox.com/js/set.js"></script>
+        <script src="https://ssl.kkbox.com/js/ui.js"></script>
+
+        <script type="text/javascript" src="https://ssl.kkbox.com/js/address_builder.js"></script>
+<script src="https://ssl.kkbox.com/js/jquery.reveal.js"></script>
+<script src="https://ssl.kkbox.com/js/pikaday_i18n.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/pikaday.min.js"></script>
+<script type="text/javascript">
+    var i = 2;
+    $(document).ready(function(){
+        var now = new Date();
+        function getMonth(date) {
+            var month = date.getMonth() + 1;
+            return month < 10 ? '0' + month : '' + month;
+        }
+
+        function getDay(date) {
+            var day = date.getDate();
+            return day < 10 ? '0' + day : '' + day;
+        }
+
+        var picker = new Pikaday({
+            field: document.getElementById('birthday'),
+            format: 'YYYY/MM/DD',
+            i18n: getPikadayI18n('tc'),
+            minDate: new Date('1900-01-01'),
+            maxDate: now,
+            yearRange: [1900, now.getFullYear()],
+            toString: function(date, format) {
+                var day = getDay(date);
+                var month = getMonth(date);
+                var year = date.getFullYear();
+                return year + "/" + month + "/" + day;
+            }
+        });
+
+                KKBOX.addressBuilder.init("area_sno", "county", "zipcode");
+        KKBOX.addressBuilder.init("area_sno_billing", "county_billing", "zipcode_billing");
+        
+        var sureChangeSecure = false;
+        var secureQuizSel = 0;
+        var checkUid_status = 0;
+
+        var defaultAnswer = "";
+        var defaultQuizSno = "";
+
+        $("#close-msg").click(function() {
+            $('#requireDataMsg').fadeOut();
+        });
+
+        $('#upload_student_id_info_btn').click(function(){
+            $('#upload_student_id_info_div').find('#desc').load('../billing/confirm_info.php?action=show_upload_student_id_info');
+        });
+
+        $('#upload_student_attachment').hide();
+
+        $('#upload_student_id_btn').click(function(){
+            $('#upload_student_attachment').show();
+            $('#default_member').hide();
+            $('#student_id_notice').hide();
+            $('#require_data_msg').hide();
+            return false;
+        });
+
+        $('body').on("click",".upload_btn",function(){
+            $(this).prev().siblings(".upload_item").click();
+        });
+
+        $('body').on('change', '.upload_item', function(){
+            $(this).next().val($(this).val());
+        });
+
+        var checkBeforeLeave = function() {
+            // 登出前檢查必填欄位
+            var emptyFields = '';
+            var fieldDesc = '';
+
+            if ('' == $('#cname').val()) {
+                fieldDesc = 'name';
+                emptyFields += fieldDesc + ', ';
+            }
+
+            if (!$('#male').attr('checked') && !$('#female').attr('checked')) {
+                fieldDesc = 'gender';
+                emptyFields += fieldDesc + ', ';
+            }
+
+            if ('' == $('#birthday').val()) {
+                fieldDesc = 'birthday';
+                emptyFields += fieldDesc + ', ';
+            }
+
+            if ('' != emptyFields) {
+                return 'You have not completed ' + emptyFields.slice(0, -2) + ' yet, please make sure you have filled in all the blanks and saved the changes before logging out. Thank you!';
+            } else {
+                return '';
+            }
+        };
+
+        var updateProfile = function(profile){
+            var token = $('#token').val();
+            $.ajax({
+                url: "https://ssl.kkbox.com/tw/membership/index.php",
+                type: "POST",
+                data: "token=" + token + "&request=updatemember&data="+JSON.stringify(profile),
+                dataType: "json",
+                success: function(data){
+                    $(".text-error").each(function() {
+                        $(this).hide();
+                    });
+
+                    if("SUCCESS" == data.status) {
+                        if (true == sureChangeSecure) {
+                            $("#changeSecure").click();
+                        }
+
+                        alert(data.msg);
+                        $("#requireDataMsg").hide();
+                    } else {
+                        jQuery.each(data, function(k, val){
+                            if ('status' != k && 'msg' != k) {
+                                $("#error-" + k).html(val);
+                                $("#error-" + k).show();
+                            }
+                        });
+
+                        if (typeof data.msg != "undefined") {
+                            alert(data.msg);
+                        }
+                    }
+                }
+            });
+        }
+
+        var checkUid = function(pwd){
+            var token = $('#token').val();
+            $.ajax({
+                url: "https://ssl.kkbox.com/tw/membership/index.php",
+                type: "POST",
+                data: "token=" + token + "&request=checkuid&passwd=" + pwd,
+                dataType: "json",
+                success: function(data) {
+                    if ("FAIL" == data.status) {
+                        $('#error-checkuidPasswd').show();
+                        $('#error-checkuidPasswd').html(data.msg);
+                    } else {
+                        if (false == sureChangeSecure) {
+                            sureChangeSecure = true;
+                        } else {
+                            sureChangeSecure = false;
+                        }
+
+                        $("#secure_block").slideToggle(function(){
+                            if (false == sureChangeSecure) {
+                                $("#secureAnswer").val("");
+                                $("#changeSecure").html("編輯");
+                            } else {
+                                $("#changeSecure").html("取消編輯");
+                            }
+                        });
+
+                        $("#secureAnswer").val(defaultAnswer);
+                        $("#secureAnswerPasswd").val(defaultAnswer);
+                        $("#secureAnswer").hide();
+                        $("#secureAnswerPasswd").show();
+                        $('#error-checkuidPasswd').hide();
+                        $("#boxChangeSecure").hide();
+                        $("#boxCheckuid").hide();
+                        $("#form1").show();
+                        checkUid_status = 1;
+                    }
+                }
+            });
+        }
+
+        /*---------------------------------
+          將雙引號和反斜線做處理
+          ---------------------------------*/
+        var specialCharsReplace = function(str){
+            str = str.replace((/\\/g),"\\\\");
+            str = str.replace((/"/g),"\\\"");
+            return str;
+        }
+
+        $('#carrier_join').click(function() {
+            $('#carrier_join_form').submit();
+        });
+
+        $("#update").click(function(){
+            var profile = {};
+
+            if (true == sureChangeSecure) {
+                profile['quizSno'] =specialCharsReplace($("select#secureQuiz").val());
+                profile['secureAnswer'] = encodeURIComponent(specialCharsReplace($("#secureAnswer").val()));
+            }
+
+            profile['cname'] = encodeURIComponent(specialCharsReplace($("#cname").val()));
+                            profile['birthday'] = specialCharsReplace($("#birthday").val());
+                        profile['gender'] = $(":checked[name='gender']").val();
+            profile['phone'] = specialCharsReplace($("#phone").val());
+            profile['occup_sno'] = $('#occup_sno').val();
+                            profile['id_number'] = encodeURIComponent(specialCharsReplace($("#id_number").val()));
+                profile['local'] = $(":checked[name='local']").val();
+                profile['address'] = encodeURIComponent(specialCharsReplace($("#address").val()));
+                profile['area_sno'] = $("#area_sno").val();
+                profile['zipcode'] = encodeURIComponent(specialCharsReplace($("#county").val()));
+                profile['address_billing'] = encodeURIComponent(specialCharsReplace($("#address_billing").val()));
+                profile['area_sno_billing'] = $("#area_sno_billing").val();
+                profile['zipcode_billing'] = encodeURIComponent(specialCharsReplace($("#county_billing").val()));
+                profile['email2'] = encodeURIComponent(specialCharsReplace($("#email2").val()));
+                        updateProfile(profile);
+
+        });
+
+        $("#changeSecure").click(function(){
+            if (0 == checkUid_status) {
+                $("#form1").hide();
+                $("#boxCheckuid").show();
+            } else {
+                if(false == sureChangeSecure) {
+                    sureChangeSecure = true;
+                } else {
+                    sureChangeSecure = false;
+                }
+
+                $("#secure_block").slideToggle(function(){
+                    if(false == sureChangeSecure) {
+                        $("#secureAnswer").val("");
+                        $("#changeSecure").html("編輯");
+                    } else {
+                        $("#changeSecure").html("取消編輯");
+                    }
+                });
+            }
+
+            $("#secureAnswer").val(defaultAnswer);
+            $("#secureAnswerPasswd").val(defaultAnswer);
+            $("#secureAnswer").hide();
+            $("#secureAnswerPasswd").show();
+
+            return false;
+        });
+
+        $("#checkuid").click(function(){
+            checkUid($("#checkuidPasswd").val());
+        });
+
+        $("#checkuidPasswd").keypress(function (event) {
+            if (event.which == 13) {
+                checkUid($("#checkuidPasswd").val());
+            }
+        });
+
+        $("#check_cancel").click(function(){
+            $("#boxCheckuid").hide();
+            $("#form1").show();
+            $("#boxChangeSecure").show();
+            $("#error-checkuidPasswd").hide();
+        });
+
+        $("#secureQuiz").change(function(){
+            if (0 == $("select#secureQuiz").val()) {
+                $("select#secureQuiz")[0].selectedIndex = secureQuizSel;
+            } else {
+                secureQuizSel = $("select#secureQuiz").val();
+                if (defaultQuizSno == $("select#secureQuiz").val()) {
+                    $("#secureAnswer").val(defaultAnswer);
+                    $("#secureAnswerPasswd").val(defaultAnswer);
+                    $("#secureAnswerPasswd").show();
+                    $("#secureAnswer").hide();
+                } else {
+                    $("#secureAnswer").show();
+                    $("#secureAnswerPasswd").hide();
+                    $("#secureAnswer").val("");
+                }
+            }
+        });
+
+        $("#secureAnswerPasswd").focus(function(){
+            $("#secureAnswerPasswd").hide();
+            $("#secureAnswer").show();
+            $("#secureAnswer").focus();
+        });
+
+        // (#88330) 提示用戶會員中心欄位已匯入 FB 資料
+                $(".exclamation > img").mouseover(function(){
+            $(this).siblings('p').css('display', 'inline');
+        });
+        $(".exclamation > img").mouseout(function(){
+            $(this).siblings('p').css('display', 'none');
+        });
+            });
+    function add_upload_button()
+    {
+        if (i < 5) {
+            var text = "<div style=\'clear:both;\'><input type=\'file\' name=\'upload_student_id[]\' id=\'student_upload_item" + i + "\' class=\'upload_item\' ><input type=\'text\' id=\'student_upload_input" + i + "\' class=\'upload_input\' disabled> <button type=\'button\' id=\'student_upload_btn" + i + "\' class=\'upload_btn\'>開啟檔案</button><img src=\'https://ssl.kkbox.com/images/cancel.png\' style=\'weight:18px;height:18px;margin-left: 0px;\' onClick=\'delupload(this);\'></div>";
+            $("#upload_student_id_form").after(text);
+            i++;
+        }
+    }
+    function delupload(my) {
+        $(my).closest("div").remove();
+        i--;
+    }
+</script>
+    </body>
+</html>
+

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="tc">
+    <head>
+        <meta charset="UTF-8" />
+    </head>
+    <body>
+        <input type='file' name='upload_student_id[]' id='student_upload_item' class='upload_item'>
+        <input type='text' id='student_upload_input' class='upload_input' disabled>
+        <button type='button' id='student_upload_btn' class='upload_btn'>開啟檔案</button>
+        <img onclick = add_upload_button(); id = "add_upload_button_btn" style="with:18px;height:18px;margin-left: 0px;" src='https://ssl.kkbox.com/images/plus.png'>
+        <p>1. 上傳檔案類型限：*.jpg、*.jpeg、*.png、*.gif</p>
+        <p>2. 單一檔案容量限制：3MB</p>
+        <p>3. 一張學生證只能用來驗證一組帳號，並且限本人申請。</p>
+    <input type='submit' name='set_student_id' class='btn btn-primary btn-block' id='set_student_id' value='上傳'>
+    </body>
+</html>
+
