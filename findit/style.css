@@ -64,6 +64,40 @@ html, body {
   margin-bottom: 24px;
 }
 
+/* ─── LOADING BAR ───────────────────────────────────────────── */
+#loading-wrap {
+  margin-bottom: 20px;
+}
+
+#loading-bar-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+#loading-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #e94560, #ffd700);
+  border-radius: 3px;
+  transition: width 0.2s ease;
+}
+
+#loading-label {
+  font-size: 0.8rem;
+  color: #aaa;
+  text-align: center;
+}
+
+#btn-start:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .dialog button {
   background: #e94560;
   color: #fff;
@@ -269,6 +303,19 @@ html, body {
 
 .ring-bar.urgent {
   stroke: #e94560;
+}
+
+.timer-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: bold;
+  color: #ffd700;
+  pointer-events: none;
+  line-height: 1;
 }
 
 

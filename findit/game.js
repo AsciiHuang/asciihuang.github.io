@@ -111,12 +111,41 @@ let challengerBlocked = false;
 let playerTarget = 0;
 let challengerTarget = 0;
 
+// ─── Preload ──────────────────────────────────────────────────────────────────
+function preloadImages(onReady) {
+  const loadingWrap  = document.getElementById('loading-wrap');
+  const loadingFill  = document.getElementById('loading-bar-fill');
+  const loadingLabel = document.getElementById('loading-label');
+  const btnStart     = document.getElementById('btn-start');
+
+  let loaded = 0;
+  const total = IMAGES.length;
+
+  IMAGES.forEach(name => {
+    const img = new Image();
+    img.onload = img.onerror = () => {
+      loaded++;
+      const pct = Math.round((loaded / total) * 100);
+      loadingFill.style.width = pct + '%';
+      loadingLabel.textContent = `載入中… ${pct}%`;
+      if (loaded === total) {
+        loadingLabel.textContent = '準備好了！';
+        loadingWrap.style.display = 'none';
+        btnStart.disabled = false;
+        if (onReady) onReady();
+      }
+    };
+    img.src = imgSrc(name);
+  });
+}
+
 // ─── DOM refs ─────────────────────────────────────────────────────────────────
 const tutorialOverlay  = document.getElementById('tutorial-overlay');
 const resultOverlay    = document.getElementById('result-overlay');
 const btnStart         = document.getElementById('btn-start');
 const btnNewGame       = document.getElementById('btn-new-game');
 const timerRingBar     = document.getElementById('timer-ring-bar');
+const timerText        = document.getElementById('timer-text');
 const playerCountEl    = document.getElementById('player-count');
 const challengerCountEl= document.getElementById('challenger-count');
 const playerBoard      = document.getElementById('player-board');
@@ -307,6 +336,8 @@ function updateTimerUI(t) {
   const ratio = Math.max(0, t) / GAME_TIME;
   timerRingBar.style.strokeDashoffset = RING_CIRCUMFERENCE * (1 - ratio);
   timerRingBar.classList.toggle('urgent', t <= 10);
+  timerText.textContent = Math.max(0, t);
+  timerText.style.color = t <= 10 ? '#e94560' : '#ffd700';
 }
 
 function startTimer() {
@@ -365,6 +396,7 @@ function hideOverlay(el) {
 }
 
 // ─── Event listeners ──────────────────────────────────────────────────────────
+preloadImages();
 btnStart.addEventListener('click', startGame);
 btnNewGame.addEventListener('click', startGame);
 

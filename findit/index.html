@@ -13,7 +13,13 @@
       <img src="images/logo_light.png" alt="Lightning Hit" class="logo" />
       <h2>怎麼玩</h2>
       <p>兩位玩家各守一邊<br/>找到與對方相同的圖案，率先點擊得分！<br/>答錯扣一分，99 秒內得分最多者獲勝。</p>
-      <button id="btn-start">開始遊戲</button>
+      <div id="loading-wrap">
+        <div id="loading-bar-track">
+          <div id="loading-bar-fill"></div>
+        </div>
+        <div id="loading-label">載入中…</div>
+      </div>
+      <button id="btn-start" disabled>開始遊戲</button>
     </div>
   </div>
 
@@ -61,6 +67,7 @@
           <circle class="ring-bg" cx="22" cy="22" r="17"/>
           <circle id="timer-ring-bar" class="ring-bar" cx="22" cy="22" r="17"/>
         </svg>
+        <span id="timer-text" class="timer-text">99</span>
       </div>
 
       <!-- Player score (right, arrow points down toward player) -->
