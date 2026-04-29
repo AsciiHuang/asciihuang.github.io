@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Beans - 遊戲</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="page-game">
+
+  <div id="game-wrapper">
+
+    <!-- Top bar -->
+    <div id="game-topbar">
+      <button class="game-btn" id="btn-back">← 返回</button>
+      <button class="game-btn" id="btn-newgame">新遊戲</button>
+    </div>
+
+    <!-- Info: score + next beans -->
+    <div id="game-info">
+      <div id="score-wrap">
+        <span id="score-label">分數</span>
+        <span id="score-display">0</span>
+      </div>
+      <div id="next-wrap">
+        <span id="next-label">下一顆</span>
+        <div id="next-0" class="next-bean bean-1"></div>
+        <div id="next-1" class="next-bean bean-2"></div>
+        <div id="next-2" class="next-bean bean-3"></div>
+      </div>
+    </div>
+
+    <!-- Game board -->
+    <div id="board-wrap">
+      <div id="game-board"></div>
+    </div>
+
+  </div>
+
+  <!-- Moving bean (for animation) -->
+  <div id="moving-bean"></div>
+
+  <!-- Message overlay -->
+  <div id="message-overlay">
+    <div id="message-box">
+      <div id="message-text">無效路徑</div>
+      <div id="message-sub"></div>
+      <button id="btn-msg-newgame">再玩一次</button>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>FindIt – Lightning Hit</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- TUTORIAL OVERLAY -->
+  <div id="tutorial-overlay" class="overlay active">
+    <div class="dialog">
+      <img src="images/logo_light.png" alt="Lightning Hit" class="logo" />
+      <h2>怎麼玩</h2>
+      <p>兩位玩家各守一邊<br/>找到與對方相同的圖案，率先點擊得分！<br/>答錯扣一分，99 秒內得分最多者獲勝。</p>
+      <button id="btn-start">開始遊戲</button>
+    </div>
+  </div>
+
+  <!-- RESULT OVERLAY -->
+  <div id="result-overlay" class="overlay">
+    <div class="dialog">
+      <h2>時間到！</h2>
+      <div class="result-scores">
+        <div class="result-player">
+          <span class="result-label">玩家 1</span>
+          <span id="result-player-score" class="result-score">0</span>
+        </div>
+        <div class="result-vs">VS</div>
+        <div class="result-challenger">
+          <span class="result-label">玩家 2</span>
+          <span id="result-challenger-score" class="result-score">0</span>
+        </div>
+      </div>
+      <div id="result-winner" class="result-winner"></div>
+      <button id="btn-new-game">再玩一次</button>
+    </div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen">
+    <!-- CHALLENGER (top, rotated 180°) -->
+    <div id="challenger-area" class="player-area challenger">
+      <div id="challenger-board" class="board"></div>
+    </div>
+
+    <!-- DIVIDER LINE -->
+    <div class="divider-line"></div>
+
+    <!-- CENTER HUD -->
+    <div class="center-hud">
+      <!-- Challenger score (left, arrow points up toward challenger) -->
+      <div class="score-badge challenger-badge">
+        <div class="arrow arrow-up"></div>
+        <div id="challenger-count" class="count">0</div>
+      </div>
+
+      <!-- Timer circle -->
+      <div class="timer-wrap">
+        <svg class="timer-ring" viewBox="0 0 44 44">
+          <circle class="ring-bg" cx="22" cy="22" r="17"/>
+          <circle id="timer-ring-bar" class="ring-bar" cx="22" cy="22" r="17"/>
+        </svg>
+      </div>
+
+      <!-- Player score (right, arrow points down toward player) -->
+      <div class="score-badge player-badge">
+        <div id="player-count" class="count">0</div>
+        <div class="arrow arrow-down"></div>
+      </div>
+    </div>
+
+    <!-- PLAYER (bottom) -->
+    <div id="player-area" class="player-area player">
+      <div id="player-board" class="board"></div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

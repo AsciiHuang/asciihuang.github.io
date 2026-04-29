@@ -1,0 +1,338 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #1a1a2e;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  touch-action: none;
+}
+
+/* ─── OVERLAYS ─────────────────────────────────────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.82);
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.dialog {
+  background: linear-gradient(145deg, #16213e, #0f3460);
+  border: 2px solid #e94560;
+  border-radius: 20px;
+  padding: 36px 28px;
+  text-align: center;
+  color: #fff;
+  max-width: 320px;
+  width: 88%;
+  box-shadow: 0 8px 40px rgba(233, 69, 96, 0.35);
+}
+
+.logo {
+  width: 120px;
+  margin-bottom: 16px;
+}
+
+.dialog h2 {
+  font-size: 1.5rem;
+  color: #e94560;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+
+.dialog p {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #ccc;
+  margin-bottom: 24px;
+}
+
+.dialog button {
+  background: #e94560;
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 12px 40px;
+  font-size: 1.05rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  letter-spacing: 1px;
+}
+
+.dialog button:active {
+  background: #c73652;
+  transform: scale(0.96);
+}
+
+/* Result scores */
+.result-scores {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 20px 0 8px;
+}
+
+.result-player,
+.result-challenger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.result-label {
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+.result-score {
+  font-size: 2.8rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+.result-vs {
+  font-size: 1rem;
+  color: #e94560;
+  font-weight: bold;
+}
+
+.result-winner {
+  font-size: 1.1rem;
+  color: #ffd700;
+  font-weight: bold;
+  min-height: 28px;
+  margin-bottom: 20px;
+}
+
+/* ─── GAME SCREEN ───────────────────────────────────────────── */
+#game-screen {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.player-area {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#player-area {
+  bottom: 0;
+  top: calc(50% + 20px);
+}
+
+#challenger-area {
+  top: 0;
+  bottom: calc(50% + 20px);
+}
+
+/* Challenger is flipped 180° */
+.challenger {
+  transform: rotate(180deg);
+}
+
+/* ─── CENTER HUD ────────────────────────────────────────────── */
+.center-hud {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 5px 12px;
+  background: #0a0a14;
+  border: 2px solid #e94560;
+  border-radius: 50px;
+  box-shadow: 0 0 20px rgba(233, 69, 96, 0.4);
+}
+
+/* 分界線：獨立元素，HUD 浮在上面蓋住中間 */
+.divider-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  background: #e94560;
+  z-index: 9;
+}
+
+/* ─── SCORE BADGES ──────────────────────────────────────────── */
+.score-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.2);
+  border-radius: 50px;
+  padding: 4px 10px;
+}
+
+.count {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #fff;
+  min-width: 24px;
+  text-align: center;
+}
+
+.count.pop {
+  animation: pop 0.25s ease;
+}
+
+@keyframes pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.5); }
+  100% { transform: scale(1); }
+}
+
+/* Arrows */
+.arrow {
+  width: 0;
+  height: 0;
+  flex-shrink: 0;
+}
+
+/* Points up — toward challenger (top area) */
+.arrow-up {
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 7px solid #e94560;
+}
+
+/* Points down — toward player (bottom area) */
+.arrow-down {
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 7px solid #e94560;
+}
+
+/* ─── TIMER CIRCLE ──────────────────────────────────────────── */
+.timer-wrap {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+}
+
+.timer-ring {
+  width: 44px;
+  height: 44px;
+  transform: rotate(-90deg);
+}
+
+.ring-bg {
+  fill: none;
+  stroke: rgba(255,255,255,0.12);
+  stroke-width: 7;
+}
+
+.ring-bar {
+  fill: none;
+  stroke: #ffd700;
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-dasharray: 106.81; /* 2π × 17 */
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.9s linear, stroke 0.3s;
+}
+
+.ring-bar.urgent {
+  stroke: #e94560;
+}
+
+
+/* ─── BOARD ─────────────────────────────────────────────────── */
+.board {
+  flex: 1;
+  display: grid;
+  gap: 6px;
+  padding: 6px;
+  overflow: hidden;
+  /* columns / rows set by JS via inline style */
+}
+
+.card-btn {
+  background: none;
+  border: none;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.1s;
+  overflow: visible;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.card-btn:active {
+  transform: scale(0.93);
+}
+
+.card-btn img {
+  object-fit: contain;
+  pointer-events: none;
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* Correct answer shake */
+.card-btn.correct {
+  background: radial-gradient(circle, rgba(76,175,80,0.35) 0%, transparent 60%);
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%   { transform: translateX(0); }
+  15%  { transform: translateX(-6px); }
+  30%  { transform: translateX(6px); }
+  45%  { transform: translateX(-5px); }
+  60%  { transform: translateX(5px); }
+  75%  { transform: translateX(-3px); }
+  90%  { transform: translateX(3px); }
+  100% { transform: translateX(0); }
+}
+
+/* Wrong answer flash */
+.card-btn.wrong {
+  background: radial-gradient(circle, rgba(233,69,96,0.35) 0%, transparent 60%);
+  animation: wrong-flash 0.3s ease;
+}
+
+@keyframes wrong-flash {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(0.88); }
+  100% { transform: scale(1); }
+}

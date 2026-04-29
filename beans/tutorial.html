@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beans - 教學</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="page-other">
+  <div class="page-container">
+    <div class="page-header">
+      <button class="back-btn" onclick="location.href='index.html'">← 返回</button>
+      <span class="page-title">教學</span>
+    </div>
+
+    <div class="tutorial-card">
+      <h2>遊戲目標</h2>
+      <p>將相同顏色的豆子連成一排（橫、縱或斜），連續 <strong>5 顆以上</strong>即可消除得分！</p>
+    </div>
+
+    <div class="tutorial-card">
+      <h2>豆子種類</h2>
+      <p>遊戲共有最多 7 種顏色的豆子：</p>
+      <div class="bean-demo">
+        <div class="bean-circle" style="background:radial-gradient(circle at 35% 35%,#ff8c69,#e83030)"></div>
+        <div class="bean-circle" style="background:radial-gradient(circle at 35% 35%,#78e08f,#1a9e2e)"></div>
+        <div class="bean-circle" style="background:radial-gradient(circle at 35% 35%,#74b9ff,#0066cc)"></div>
+        <div class="bean-circle" style="background:radial-gradient(circle at 35% 35%,#ffd96a,#e0a800)"></div>
+        <div class="bean-circle" style="background:radial-gradient(circle at 35% 35%,#f59afe,#9b30c8)"></div>
+        <div class="bean-circle" style="background:radial-gradient(circle at 35% 35%,#fd9e6a,#e65d00)"></div>
+        <div class="bean-circle" style="background:radial-gradient(circle at 35% 35%,#a1f0e8,#00897b)"></div>
+      </div>
+      <p>簡單模式使用前 5 種，困難模式使用全部 7 種。</p>
+    </div>
+
+    <div class="tutorial-card">
+      <h2>操作方式</h2>
+      <ol>
+        <li><strong>點選</strong>一顆豆子（被選中的豆子會發光）</li>
+        <li>再<strong>點選</strong>一個空格，豆子會自動沿路徑移動過去</li>
+        <li>若目標格<strong>無法到達</strong>（路被其他豆子擋住），會顯示「無效路徑」</li>
+        <li>每移動一次，地圖上會<strong>新增 3 顆豆子</strong></li>
+        <li>消除 5 顆以上則<strong>不會新增豆子</strong>，繼續累積分數</li>
+      </ol>
+    </div>
+
+    <div class="tutorial-card">
+      <h2>遊戲結束</h2>
+      <p>當地圖上<strong>空格不足 4 格</strong>，無法再放入新豆子時遊戲結束，最高分會自動記錄。</p>
+    </div>
+  </div>
+</body>
+</html>

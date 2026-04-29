@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beans - 選項</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="page-other">
+  <div class="page-container">
+    <div class="page-header">
+      <button class="back-btn" onclick="location.href='index.html'">← 返回</button>
+      <span class="page-title">選項</span>
+    </div>
+
+    <div class="option-card">
+      <div class="option-row">
+        <div class="option-info">
+          <h3>困難模式</h3>
+          <p>開啟後使用 7 種豆子（困難），關閉則使用 5 種豆子（簡單）。</p>
+        </div>
+        <div class="toggle-wrap">
+          <input type="checkbox" class="toggle-input" id="toggle-mode">
+          <label class="toggle-label" for="toggle-mode"></label>
+        </div>
+      </div>
+
+      <div class="option-row">
+        <div class="option-info">
+          <h3>背景音樂</h3>
+          <p>開啟或關閉背景音樂。</p>
+        </div>
+        <div class="toggle-wrap">
+          <input type="checkbox" class="toggle-input" id="toggle-music">
+          <label class="toggle-label" for="toggle-music"></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const get = (k, d) => { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); };
+    const set = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+
+    const modeToggle  = document.getElementById('toggle-mode');
+    const musicToggle = document.getElementById('toggle-music');
+
+    // Load saved values
+    modeToggle.checked  = get('BeansSettingGameMode', 7) === 7;
+    musicToggle.checked = get('BeansSettingPlayBackgroundMusic', true);
+
+    modeToggle.addEventListener('change', () => {
+      set('BeansSettingGameMode', modeToggle.checked ? 7 : 5);
+    });
+
+    musicToggle.addEventListener('change', () => {
+      set('BeansSettingPlayBackgroundMusic', musicToggle.checked);
+    });
+  </script>
+</body>
+</html>
