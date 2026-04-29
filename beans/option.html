@@ -46,7 +46,7 @@
     const musicToggle = document.getElementById('toggle-music');
 
     // Load saved values
-    modeToggle.checked  = get('BeansSettingGameMode', 7) === 7;
+    modeToggle.checked  = get('BeansSettingGameMode', 5) === 7;
     musicToggle.checked = get('BeansSettingPlayBackgroundMusic', true);
 
     modeToggle.addEventListener('change', () => {

@@ -140,7 +140,7 @@ class BeansGame {
     this.score = 0;
     this.animating = false;
     this.gameOver = false;
-    this.mode = Storage.get(KEY_MODE, BEANS_HARD);
+    this.mode = Storage.get(KEY_MODE, BEANS_EASY);
 
     this._buildBoard();
     this.newGame();
@@ -167,7 +167,7 @@ class BeansGame {
 
   // ---- New Game ----
   newGame() {
-    this.mode = Storage.get(KEY_MODE, BEANS_HARD);
+    this.mode = Storage.get(KEY_MODE, BEANS_EASY);
     this.map = Array.from({ length: ROWS }, () => new Array(COLS).fill(0));
     this.score = 0;
     this.selected = null;

@@ -7,8 +7,8 @@
 
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
-  background: #1a0a2e;
-  color: #fff;
+  background: #c8a882;
+  color: #3d2200;
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -18,7 +18,7 @@ body {
 
 /* ===== Main Menu ===== */
 .page-main {
-  background: radial-gradient(ellipse at center, #2d1b5e 0%, #0d0520 100%);
+  background: radial-gradient(ellipse at center, #d4b896 0%, #b8936a 100%);
 }
 
 .main-container {
@@ -37,10 +37,10 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  background: rgba(255,255,255,0.03);
+  background: rgba(255,245,235,0.35);
   border-radius: 24px;
-  border: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 8px 64px rgba(0,0,0,0.5);
+  border: 1px solid rgba(101,67,33,0.25);
+  box-shadow: 0 8px 64px rgba(101,67,33,0.3);
 }
 
 .main-bg::before {
@@ -48,7 +48,7 @@ body {
   font-size: 2.8rem;
   font-weight: 900;
   letter-spacing: 4px;
-  background: linear-gradient(135deg, #ff9a4d, #ff6b9d, #c77dff);
+  background: linear-gradient(135deg, #7a3e00, #c8600a);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -91,10 +91,10 @@ body {
 .menu-btn:hover::after { opacity: 1; }
 .menu-btn:active { transform: scale(0.96); }
 
-#btn-start    { background: linear-gradient(135deg, #ff6b6b, #ff9a4d); color: #fff; box-shadow: 0 4px 20px rgba(255,107,107,0.4); }
-#btn-tutorial { background: linear-gradient(135deg, #4ecdc4, #44a08d); color: #fff; box-shadow: 0 4px 20px rgba(78,205,196,0.35); }
-#btn-score    { background: linear-gradient(135deg, #a18cd1, #fbc2eb); color: #fff; box-shadow: 0 4px 20px rgba(161,140,209,0.4); }
-#btn-option   { background: linear-gradient(135deg, #f093fb, #f5576c); color: #fff; box-shadow: 0 4px 20px rgba(245,87,108,0.4); }
+#btn-start    { background: linear-gradient(135deg, #c8600a, #e8882a); color: #fff; box-shadow: 0 4px 20px rgba(200,96,10,0.4); }
+#btn-tutorial { background: linear-gradient(135deg, #7a5c3a, #a07848); color: #fff; box-shadow: 0 4px 20px rgba(122,92,58,0.4); }
+#btn-score    { background: linear-gradient(135deg, #b8813a, #d4a060); color: #fff; box-shadow: 0 4px 20px rgba(184,129,58,0.4); }
+#btn-option   { background: linear-gradient(135deg, #8c5a2a, #b07840); color: #fff; box-shadow: 0 4px 20px rgba(140,90,42,0.4); }
 
 .menu-btn:hover {
   transform: translateY(-2px) scale(1.02);
@@ -103,7 +103,7 @@ body {
 
 /* ===== Shared Page Layout ===== */
 .page-other {
-  background: radial-gradient(ellipse at center, #1a2a4e 0%, #050d1f 100%);
+  background: radial-gradient(ellipse at center, #d4b896 0%, #b8936a 100%);
 }
 
 .page-container {
@@ -124,9 +124,9 @@ body {
 }
 
 .back-btn {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: #fff;
+  background: rgba(101,67,33,0.15);
+  border: 1px solid rgba(101,67,33,0.3);
+  color: #3d2200;
   padding: 8px 18px;
   border-radius: 50px;
   cursor: pointer;
@@ -135,13 +135,13 @@ body {
   transition: background 0.15s, transform 0.15s;
 }
 
-.back-btn:hover { background: rgba(255,255,255,0.18); transform: translateX(-2px); }
+.back-btn:hover { background: rgba(101,67,33,0.25); transform: translateX(-2px); }
 
 .page-title {
   font-size: 1.6rem;
   font-weight: 900;
   letter-spacing: 2px;
-  background: linear-gradient(135deg, #c77dff, #ff9a4d);
+  background: linear-gradient(135deg, #7a3e00, #c8600a);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -149,8 +149,8 @@ body {
 
 /* ===== Score Page ===== */
 .score-card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,245,235,0.35);
+  border: 1px solid rgba(101,67,33,0.25);
   border-radius: 16px;
   padding: 28px 24px;
   display: flex;
@@ -164,12 +164,12 @@ body {
   align-items: center;
   padding: 14px 18px;
   border-radius: 12px;
-  background: rgba(255,255,255,0.04);
+  background: rgba(101,67,33,0.08);
 }
 
 .score-label {
   font-size: 1rem;
-  color: #aaa;
+  color: #7a5c3a;
   letter-spacing: 1px;
 }
 
@@ -184,8 +184,8 @@ body {
 
 /* ===== Option Page ===== */
 .option-card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,245,235,0.35);
+  border: 1px solid rgba(101,67,33,0.25);
   border-radius: 16px;
   padding: 28px 24px;
   display: flex;
@@ -201,8 +201,8 @@ body {
 }
 
 .option-info { flex: 1; }
-.option-info h3 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
-.option-info p  { font-size: 0.82rem; color: #888; line-height: 1.4; }
+.option-info h3 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; color: #3d2200; }
+.option-info p  { font-size: 0.82rem; color: #7a5c3a; line-height: 1.4; }
 
 /* Toggle Switch */
 .toggle-wrap { flex-shrink: 0; }
@@ -211,7 +211,7 @@ body {
   display: block;
   width: 52px;
   height: 28px;
-  background: #333;
+  background: rgba(101,67,33,0.25);
   border-radius: 50px;
   cursor: pointer;
   position: relative;
@@ -229,29 +229,29 @@ body {
   transition: transform 0.25s;
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
-.toggle-input:checked + .toggle-label { background: linear-gradient(135deg, #c77dff, #6a5acd); }
+.toggle-input:checked + .toggle-label { background: linear-gradient(135deg, #c8600a, #e8882a); }
 .toggle-input:checked + .toggle-label::after { transform: translateX(24px); }
 
 /* ===== Tutorial Page ===== */
 .tutorial-card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,245,235,0.35);
+  border: 1px solid rgba(101,67,33,0.25);
   border-radius: 16px;
   padding: 28px 24px;
   line-height: 1.7;
   font-size: 0.95rem;
-  color: #ccc;
+  color: #5a3a1a;
 }
 
 .tutorial-card h2 {
-  color: #fff;
+  color: #3d2200;
   margin-bottom: 12px;
   font-size: 1.1rem;
 }
 
 .tutorial-card ol { padding-left: 20px; }
 .tutorial-card ol li { margin-bottom: 10px; }
-.tutorial-card strong { color: #ff9a4d; }
+.tutorial-card strong { color: #c8600a; }
 
 .bean-demo {
   display: flex;
@@ -265,7 +265,7 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.3);
+  border: 2px solid rgba(101,67,33,0.3);
 }
 
 /* ===== Game Page ===== */
@@ -515,12 +515,12 @@ body.page-game {
 }
 
 #message-box {
-  background: rgba(20, 10, 40, 0.92);
-  border: 1px solid rgba(199,125,255,0.4);
+  background: rgba(255,245,235,0.96);
+  border: 1px solid rgba(101,67,33,0.35);
   border-radius: 16px;
   padding: 24px 40px;
   text-align: center;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+  box-shadow: 0 8px 40px rgba(101,67,33,0.35);
   pointer-events: auto;
   transform: scale(0);
 }
@@ -532,7 +532,7 @@ body.page-game {
   font-size: 1.6rem;
   font-weight: 900;
   letter-spacing: 2px;
-  background: linear-gradient(135deg, #c77dff, #ff9a4d);
+  background: linear-gradient(135deg, #7a3e00, #c8600a);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -540,14 +540,14 @@ body.page-game {
 
 #message-sub {
   font-size: 0.85rem;
-  color: #888;
+  color: #7a5c3a;
   margin-top: 6px;
 }
 
 #btn-msg-newgame {
   margin-top: 18px;
   padding: 10px 28px;
-  background: linear-gradient(135deg, #ff6b6b, #ff9a4d);
+  background: linear-gradient(135deg, #c8600a, #e8882a);
   color: #fff;
   border: none;
   border-radius: 50px;
