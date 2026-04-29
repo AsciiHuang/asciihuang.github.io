@@ -216,3 +216,26 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local configuration file
+local.properties
+/doc/
+/project.properties
+out/
+.DS_Store
+
+# files for the dex VM
+*.dex
+
+# Java class files
+*.class
+
+# Ignore gradle files
+.gradle/
+build/
+.idea/*
+projectFilesBackup/
+
+# generated files
+bin/
+gen/
