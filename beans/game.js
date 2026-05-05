@@ -568,11 +568,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // Responsive cell size
   function resize() {
     const boardWrap = document.getElementById('board-wrap');
-    const ww = boardWrap.clientWidth  - 24;
-    const wh = boardWrap.clientHeight - 24;
+    // Subtract board padding (4×2=8), border (1×2=2), and gap between cells
+    const overhead = 8 + 2; // padding + border
+    const gapH = 3 * (ROWS - 1);
+    const gapW = 3 * (COLS - 1);
+    const ww = boardWrap.clientWidth  - overhead - gapW;
+    const wh = boardWrap.clientHeight - overhead - gapH;
     const byW = Math.floor(ww / COLS);
     const byH = Math.floor(wh / ROWS);
-    const size = Math.max(28, Math.min(byW, byH, 52));
+    const size = Math.max(20, Math.min(byW, byH, 52));
     document.documentElement.style.setProperty('--cell-size', size + 'px');
     boardEl.style.gridTemplateColumns = `repeat(${COLS}, ${size}px)`;
   }

@@ -104,6 +104,8 @@ body {
 /* ===== Shared Page Layout ===== */
 .page-other {
   background: radial-gradient(ellipse at center, #d4b896 0%, #b8936a 100%);
+  overflow-y: auto;
+  align-items: flex-start;
 }
 
 .page-container {
@@ -281,6 +283,7 @@ body.page-game {
   max-width: 700px;
   padding: 8px;
   gap: 8px;
+  overflow: hidden;
 }
 
 /* Top bar */
@@ -370,10 +373,12 @@ body.page-game {
 #board-wrap {
   position: relative;
   flex: 1;
+  min-height: 0;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
 #game-board {
