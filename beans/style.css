@@ -176,10 +176,7 @@ body {
 .score-value {
   font-size: 2rem;
   font-weight: 900;
-  background: linear-gradient(135deg, #ffd700, #ff9a4d);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #3d2200;
 }
 
 /* ===== Option Page ===== */
@@ -340,10 +337,7 @@ body.page-game {
 #score-display {
   font-size: 1.5rem;
   font-weight: 900;
-  background: linear-gradient(135deg, #ffd700, #ff9a4d);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #3d2200;
   min-width: 50px;
 }
 
