@@ -10,7 +10,7 @@
 
   <div id="topbar">
     <div class="topbar-left">
-      <button class="top-btn" onclick="location.href='index.html'">← 返回</button>
+      <button class="top-btn" onclick="location.href='index.html'">返回首頁</button>
       <button class="top-btn" id="btn-regenerate">重新產生</button>
     </div>
     <div class="topbar-right">
@@ -90,6 +90,71 @@
         }
       }
     }
+
+    // ===== Keyboard interaction =====
+    let keyRepeatTimer = null;
+    let keyRepeatKey = null;
+
+    function moveByKey(dx, dy) {
+      if (!currentMaze || path.length === 0) return;
+      const cur = path[path.length - 1];
+      const nx = cur.x + dx;
+      const ny = cur.y + dy;
+      if (nx < 0 || nx >= COLS || ny < 0 || ny >= ROWS) return;
+      if (!canPass(cur.x, cur.y, nx, ny)) return;
+
+      // Backtrack if going back
+      if (path.length >= 2 && path[path.length - 2].x === nx && path[path.length - 2].y === ny) {
+        path.pop();
+      } else {
+        path.push({ x: nx, y: ny });
+      }
+      drawPath();
+
+      const last = path[path.length - 1];
+      if (last.x === endCell.x && last.y === endCell.y) {
+        showWin();
+      }
+    }
+
+    function getDirFromKey(key) {
+      switch (key) {
+        case 'ArrowUp':    case 'w': case 'W': return { dx: 0, dy: -1 };
+        case 'ArrowDown':  case 's': case 'S': return { dx: 0, dy: 1 };
+        case 'ArrowLeft':  case 'a': case 'A': return { dx: -1, dy: 0 };
+        case 'ArrowRight': case 'd': case 'D': return { dx: 1, dy: 0 };
+        default: return null;
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      const dir = getDirFromKey(e.key);
+      if (!dir) return;
+      e.preventDefault();
+
+      // Already holding this key
+      if (keyRepeatKey === e.key) return;
+
+      // Clear any previous repeat
+      clearInterval(keyRepeatTimer);
+      keyRepeatKey = e.key;
+
+      // Immediate first step
+      moveByKey(dir.dx, dir.dy);
+
+      // Repeat while held
+      keyRepeatTimer = setInterval(() => {
+        moveByKey(dir.dx, dir.dy);
+      }, 250);
+    });
+
+    document.addEventListener('keyup', (e) => {
+      if (e.key === keyRepeatKey) {
+        clearInterval(keyRepeatTimer);
+        keyRepeatTimer = null;
+        keyRepeatKey = null;
+      }
+    });
 
     function setupClickHandlers() {
       pathCanvas.style.cursor = 'pointer';
