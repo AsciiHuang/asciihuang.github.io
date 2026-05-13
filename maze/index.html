@@ -140,9 +140,9 @@
       <div class="label">選擇複雜度</div>
 
       <div class="complexity-selector" id="selector">
-        <button class="complexity-btn active" data-level="1">1</button>
+        <button class="complexity-btn" data-level="1">1</button>
         <button class="complexity-btn" data-level="2">2</button>
-        <button class="complexity-btn" data-level="3">3</button>
+        <button class="complexity-btn active" data-level="3">3</button>
         <button class="complexity-btn" data-level="4">4</button>
         <button class="complexity-btn" data-level="5">5</button>
         <button class="complexity-btn" data-level="6">6</button>
@@ -161,7 +161,7 @@
   </div>
 
   <script>
-    let selectedLevel = 1;
+    let selectedLevel = 3;
     const sizeInfo = document.getElementById('size-info');
 
     function updateSizeInfo(level) {
@@ -188,7 +188,7 @@
       location.href = `padmaze.html?level=${selectedLevel}`;
     });
 
-    updateSizeInfo(1);
+    updateSizeInfo(3);
   </script>
 </body>
 </html>
