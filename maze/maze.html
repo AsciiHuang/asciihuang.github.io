@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Maze</title>
+  <link rel="stylesheet" href="maze-style.css">
+</head>
+<body>
+
+  <div id="topbar">
+    <div class="topbar-left">
+      <button class="top-btn" onclick="location.href='index.html'">← 返回</button>
+      <button class="top-btn" id="btn-regenerate">重新產生</button>
+    </div>
+    <div class="topbar-right">
+      <button class="top-btn" id="btn-hint1">提示</button>
+      <button class="top-btn" id="btn-hint2">進階提示</button>
+      <button class="top-btn" id="btn-answer">答案</button>
+    </div>
+  </div>
+
+  <div id="maze-container">
+    <div class="loading" id="loading">產生迷宮中...</div>
+  </div>
+
+  <script src="maze-core.js"></script>
+  <script>
+    // ===== Click/touch interaction =====
+    function onCanvasClick(e) {
+      if (!currentMaze || path.length === 0) return;
+
+      const rect = pathCanvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      const cx = Math.floor((clickX - wallSize) / (cellSize + wallSize));
+      const cy = Math.floor((clickY - wallSize) / (cellSize + wallSize));
+
+      if (cx < 0 || cx >= COLS || cy < 0 || cy >= ROWS) return;
+
+      // Case 1: backtrack
+      for (let i = path.length - 1; i >= 0; i--) {
+        if (path[i].x === cx && path[i].y === cy) {
+          path = path.slice(0, i + 1);
+          drawPath();
+          return;
+        }
+      }
+
+      // Case 2 & 3: walk forward
+      const visitedSet = new Set();
+      for (let i = 0; i < path.length; i++) {
+        visitedSet.add(`${path[i].x},${path[i].y}`);
+      }
+
+      for (let i = path.length - 1; i >= 0; i--) {
+        const anchor = path[i];
+        const steps = tryWalkPath(anchor.x, anchor.y, cx, cy);
+        if (steps && steps.length > 0) {
+          let trimTo = i;
+          for (const step of steps) {
+            const key = `${step.x},${step.y}`;
+            if (visitedSet.has(key)) {
+              for (let j = 0; j < path.length; j++) {
+                if (path[j].x === step.x && path[j].y === step.y) {
+                  trimTo = j;
+                  break;
+                }
+              }
+            }
+          }
+
+          if (trimTo !== i) {
+            path = path.slice(0, trimTo + 1);
+            const reroute = tryWalkPath(path[trimTo].x, path[trimTo].y, cx, cy);
+            if (reroute && reroute.length > 0) {
+              path.push(...reroute);
+            }
+          } else {
+            path = path.slice(0, i + 1);
+            path.push(...steps);
+          }
+
+          drawPath();
+          if (cx === endCell.x && cy === endCell.y) {
+            showWin();
+          }
+          return;
+        }
+      }
+    }
+
+    function setupClickHandlers() {
+      pathCanvas.style.cursor = 'pointer';
+      pathCanvas.addEventListener('click', onCanvasClick);
+      pathCanvas.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        if (e.changedTouches.length > 0) {
+          const touch = e.changedTouches[0];
+          onCanvasClick({ clientX: touch.clientX, clientY: touch.clientY });
+        }
+      });
+    }
+
+    window._mazeOnReady = setupClickHandlers;
+    run(setupClickHandlers);
+  </script>
+
+  <div id="win-overlay" onclick="this.classList.remove('show')">
+    <div id="win-card" onclick="event.stopPropagation()">
+      <div class="win-crown">👑</div>
+      <div class="win-text">恭喜過關</div>
+      <button class="win-btn" onclick="document.getElementById('win-overlay').classList.remove('show')">確定</button>
+    </div>
+  </div>
+</body>
+</html>

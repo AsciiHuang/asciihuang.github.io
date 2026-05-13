@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maze</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: radial-gradient(ellipse at center, #d4b896 0%, #b8936a 100%);
+      color: #3d2200;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+      padding: 40px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+    }
+
+    h1 {
+      font-size: 2.6rem;
+      font-weight: 900;
+      letter-spacing: 4px;
+      background: linear-gradient(135deg, #7a3e00, #c8600a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .card {
+      width: 100%;
+      background: rgba(255,245,235,0.4);
+      border: 1px solid rgba(101,67,33,0.25);
+      border-radius: 20px;
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      box-shadow: 0 6px 32px rgba(101,67,33,0.2);
+    }
+
+    .label {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #3d2200;
+      letter-spacing: 1px;
+    }
+
+    .complexity-selector {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      width: 100%;
+    }
+
+    .complexity-btn {
+      padding: 12px 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border: 2px solid rgba(101,67,33,0.25);
+      border-radius: 12px;
+      background: rgba(255,248,240,0.7);
+      color: #3d2200;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .complexity-btn:hover {
+      background: rgba(200,96,10,0.12);
+      border-color: rgba(200,96,10,0.4);
+    }
+
+    .complexity-btn.active {
+      background: linear-gradient(135deg, #c8600a, #e8882a);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 3px 12px rgba(200,96,10,0.4);
+    }
+
+    .size-info {
+      font-size: 0.82rem;
+      color: #7a5c3a;
+      text-align: center;
+      min-height: 20px;
+    }
+
+    .start-btn {
+      width: 100%;
+      padding: 14px 28px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      border: none;
+      border-radius: 50px;
+      background: linear-gradient(135deg, #c8600a, #e8882a);
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(200,96,10,0.4);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .start-btn:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 28px rgba(200,96,10,0.45);
+    }
+
+    .start-btn:active {
+      transform: scale(0.96);
+    }
+
+    .description {
+      font-size: 0.88rem;
+      color: #7a5c3a;
+      text-align: center;
+      line-height: 1.6;
+      padding: 0 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Maze</h1>
+
+    <div class="card">
+      <div class="label">選擇複雜度</div>
+
+      <div class="complexity-selector" id="selector">
+        <button class="complexity-btn active" data-level="1">1</button>
+        <button class="complexity-btn" data-level="2">2</button>
+        <button class="complexity-btn" data-level="3">3</button>
+        <button class="complexity-btn" data-level="4">4</button>
+        <button class="complexity-btn" data-level="5">5</button>
+        <button class="complexity-btn" data-level="6">6</button>
+      </div>
+
+      <div class="size-info" id="size-info">迷宮大小：10 × 18</div>
+
+      <button class="start-btn" id="btn-start">使用滑鼠或觸控走迷宮</button>
+      <button class="start-btn" id="btn-start-pad">使用傾斜感應走迷宮</button>
+    </div>
+
+    <div class="description">
+      選擇複雜度產生對應難度的迷宮。<br>
+      數字越大，迷宮越複雜、路徑越多，挑戰越高！
+    </div>
+  </div>
+
+  <script>
+    let selectedLevel = 1;
+    const sizeInfo = document.getElementById('size-info');
+
+    function updateSizeInfo(level) {
+      const rows = level * 15;
+      const cols = Math.round(rows * 9 / 16);
+      sizeInfo.textContent = `迷宮大小：${cols} × ${rows}`;
+    }
+
+    document.getElementById('selector').addEventListener('click', (e) => {
+      const btn = e.target.closest('.complexity-btn');
+      if (!btn) return;
+
+      document.querySelectorAll('.complexity-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedLevel = parseInt(btn.dataset.level);
+      updateSizeInfo(selectedLevel);
+    });
+
+    document.getElementById('btn-start').addEventListener('click', () => {
+      location.href = `maze.html?level=${selectedLevel}`;
+    });
+
+    document.getElementById('btn-start-pad').addEventListener('click', () => {
+      location.href = `padmaze.html?level=${selectedLevel}`;
+    });
+
+    updateSizeInfo(1);
+  </script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Maze</title>
+  <link rel="stylesheet" href="maze-style.css">
+</head>
+<body>
+
+  <div id="topbar">
+    <div class="topbar-left">
+      <button class="top-btn" onclick="location.href='index.html'">← 返回</button>
+      <button class="top-btn" id="btn-regenerate">重新產生</button>
+    </div>
+    <div class="topbar-right">
+      <button class="top-btn" id="btn-hint1">提示</button>
+      <button class="top-btn" id="btn-hint2">進階提示</button>
+      <button class="top-btn" id="btn-answer">答案</button>
+    </div>
+  </div>
+
+  <div id="maze-container">
+    <div class="loading" id="loading">產生迷宮中...</div>
+  </div>
+
+  <script src="maze-core.js"></script>
+  <script>
+    // ===== Tilt control =====
+    let tiltBeta = 0;
+    let tiltGamma = 0;
+    let tiltAccX = 0;
+    let tiltAccY = 0;
+    let tiltRAF = null;
+
+    function startTiltControl() {
+      if (typeof DeviceOrientationEvent !== 'undefined' &&
+          typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission().then(state => {
+          if (state === 'granted') initTiltListener();
+        }).catch(() => {});
+      } else {
+        initTiltListener();
+      }
+    }
+
+    function initTiltListener() {
+      window.addEventListener('deviceorientation', (e) => {
+        tiltBeta = e.beta || 0;
+        tiltGamma = e.gamma || 0;
+      });
+      tiltLoop();
+    }
+
+    function tiltLoop() {
+      if (!currentMaze || path.length === 0) {
+        tiltRAF = requestAnimationFrame(tiltLoop);
+        return;
+      }
+
+      const deadZone = 8;
+      const maxTilt = 45;
+
+      let tx = 0, ty = 0;
+      if (Math.abs(tiltGamma) > deadZone) {
+        tx = Math.sign(tiltGamma) * Math.min(1, (Math.abs(tiltGamma) - deadZone) / (maxTilt - deadZone));
+      }
+      if (Math.abs(tiltBeta) > deadZone) {
+        ty = Math.sign(tiltBeta) * Math.min(1, (Math.abs(tiltBeta) - deadZone) / (maxTilt - deadZone));
+      }
+
+      const speed = 0.07;
+      tiltAccX += tx * speed;
+      tiltAccY += ty * speed;
+
+      while (Math.abs(tiltAccX) >= 1 || Math.abs(tiltAccY) >= 1) {
+        const cur = path[path.length - 1];
+        let moved = false;
+
+        if (Math.abs(tiltAccX) >= Math.abs(tiltAccY) && Math.abs(tiltAccX) >= 1) {
+          const dx = Math.sign(tiltAccX);
+          const nx = cur.x + dx;
+          const ny = cur.y;
+          if (nx >= 0 && nx < COLS && canPass(cur.x, cur.y, nx, ny)) {
+            if (path.length >= 2 && path[path.length - 2].x === nx && path[path.length - 2].y === ny) {
+              path.pop();
+            } else {
+              path.push({ x: nx, y: ny });
+            }
+            moved = true;
+          }
+          tiltAccX -= dx;
+        } else if (Math.abs(tiltAccY) >= 1) {
+          const dy = Math.sign(tiltAccY);
+          const nx = cur.x;
+          const ny = cur.y + dy;
+          if (ny >= 0 && ny < ROWS && canPass(cur.x, cur.y, nx, ny)) {
+            if (path.length >= 2 && path[path.length - 2].x === nx && path[path.length - 2].y === ny) {
+              path.pop();
+            } else {
+              path.push({ x: nx, y: ny });
+            }
+            moved = true;
+          }
+          tiltAccY -= dy;
+        } else {
+          break;
+        }
+
+        if (moved) {
+          drawPath();
+          const last = path[path.length - 1];
+          if (last.x === endCell.x && last.y === endCell.y) {
+            showWin();
+            tiltAccX = 0;
+            tiltAccY = 0;
+            return;
+          }
+        } else {
+          if (Math.abs(tiltAccX) >= 1) tiltAccX = 0;
+          if (Math.abs(tiltAccY) >= 1) tiltAccY = 0;
+          break;
+        }
+      }
+
+      tiltRAF = requestAnimationFrame(tiltLoop);
+    }
+
+    function setupTiltHandlers() {
+      pathCanvas.style.cursor = 'default';
+      startTiltControl();
+    }
+
+    window._mazeOnReady = setupTiltHandlers;
+    run(setupTiltHandlers);
+  </script>
+
+  <div id="win-overlay" onclick="this.classList.remove('show')">
+    <div id="win-card" onclick="event.stopPropagation()">
+      <div class="win-crown">👑</div>
+      <div class="win-text">恭喜過關</div>
+      <button class="win-btn" onclick="document.getElementById('win-overlay').classList.remove('show')">確定</button>
+    </div>
+  </div>
+</body>
+</html>

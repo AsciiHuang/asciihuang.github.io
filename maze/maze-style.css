@@ -1,0 +1,140 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: radial-gradient(ellipse at center, #d4b896 0%, #b8936a 100%);
+  color: #3d2200;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+}
+
+#topbar {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  gap: 8px;
+}
+
+.topbar-left, .topbar-right {
+  display: flex;
+  gap: 6px;
+}
+
+.top-btn {
+  padding: 8px 18px;
+  border: 1px solid rgba(101,67,33,0.3);
+  border-radius: 50px;
+  background: rgba(255,245,235,0.5);
+  color: #3d2200;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.12s;
+}
+
+.top-btn:hover { background: rgba(255,245,235,0.8); }
+.top-btn:active { transform: scale(0.94); }
+
+#info {
+  font-size: 0.85rem;
+  color: #7a5c3a;
+  font-weight: 600;
+}
+
+#maze-container {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 10px 8px;
+  width: 100%;
+}
+
+canvas {
+  display: block;
+}
+
+.maze-frame {
+  background: #fff5eb;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 6px 32px rgba(101,67,33,0.2);
+  display: inline-block;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  font-size: 1.1rem;
+  color: #7a5c3a;
+  font-weight: 600;
+}
+
+/* Win overlay */
+#win-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+}
+#win-overlay.show { display: flex; }
+
+#win-card {
+  background: rgba(255,245,235,0.95);
+  border-radius: 24px;
+  padding: 40px 36px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 8px 40px rgba(101,67,33,0.35);
+  animation: winPop 0.35s ease;
+}
+
+@keyframes winPop {
+  0% { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.win-crown {
+  font-size: 3.5rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 6px rgba(200,96,10,0.4));
+}
+
+.win-text {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #3d2200;
+  letter-spacing: 3px;
+}
+
+.win-btn {
+  margin-top: 8px;
+  padding: 10px 32px;
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #c8600a, #e8882a);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 3px 14px rgba(200,96,10,0.4);
+  transition: transform 0.12s;
+}
+.win-btn:active { transform: scale(0.94); }
