@@ -26,6 +26,22 @@
 
   <script src="maze-core.js"></script>
   <script>
+    // ===== Wake Lock (keep screen on) =====
+    let wakeLock = null;
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLock = await navigator.wakeLock.request('screen');
+          wakeLock.addEventListener('release', () => { wakeLock = null; });
+        }
+      } catch (e) {}
+    }
+    requestWakeLock();
+    // Re-acquire wake lock when page becomes visible again
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') requestWakeLock();
+    });
+
     // ===== Tilt control =====
     let tiltBeta = 0;
     let tiltGamma = 0;
