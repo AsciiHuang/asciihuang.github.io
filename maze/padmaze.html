@@ -58,18 +58,21 @@
         return;
       }
 
-      const deadZone = 8;
-      const maxTilt = 45;
+      const deadZone = 5;
+      const maxTilt = 35;
 
+      // Ease-in curve: slow at small tilts, accelerates at larger tilts
       let tx = 0, ty = 0;
       if (Math.abs(tiltGamma) > deadZone) {
-        tx = Math.sign(tiltGamma) * Math.min(1, (Math.abs(tiltGamma) - deadZone) / (maxTilt - deadZone));
+        const t = Math.min(1, (Math.abs(tiltGamma) - deadZone) / (maxTilt - deadZone));
+        tx = Math.sign(tiltGamma) * t * t; // quadratic ease-in
       }
       if (Math.abs(tiltBeta) > deadZone) {
-        ty = Math.sign(tiltBeta) * Math.min(1, (Math.abs(tiltBeta) - deadZone) / (maxTilt - deadZone));
+        const t = Math.min(1, (Math.abs(tiltBeta) - deadZone) / (maxTilt - deadZone));
+        ty = Math.sign(tiltBeta) * t * t;
       }
 
-      const speed = 0.07;
+      const speed = 0.25;
       tiltAccX += tx * speed;
       tiltAccY += ty * speed;
 
