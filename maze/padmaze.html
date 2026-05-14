@@ -5,6 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Maze</title>
   <link rel="stylesheet" href="maze-style.css">
+  <style>
+    #tilt-start-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #tilt-start-btn {
+      padding: 16px 40px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      border: none;
+      border-radius: 50px;
+      background: linear-gradient(135deg, #c8600a, #e8882a);
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(200,96,10,0.4);
+    }
+    #tilt-start-btn:active { transform: scale(0.94); }
+  </style>
 </head>
 <body>
 
@@ -49,15 +73,37 @@
     let tiltAccY = 0;
     let tiltRAF = null;
 
+    let needsPermission = typeof DeviceOrientationEvent !== 'undefined' &&
+        typeof DeviceOrientationEvent.requestPermission === 'function';
+
     function startTiltControl() {
-      if (typeof DeviceOrientationEvent !== 'undefined' &&
-          typeof DeviceOrientationEvent.requestPermission === 'function') {
-        DeviceOrientationEvent.requestPermission().then(state => {
-          if (state === 'granted') initTiltListener();
-        }).catch(() => {});
+      if (needsPermission) {
+        // iOS/iPadOS: show overlay button, request permission on user gesture
+        showStartOverlay();
       } else {
+        // Android / desktop: start directly
         initTiltListener();
       }
+    }
+
+    function showStartOverlay() {
+      const overlay = document.createElement('div');
+      overlay.id = 'tilt-start-overlay';
+      overlay.innerHTML = `
+        <button id="tilt-start-btn">點擊開始遊戲</button>
+      `;
+      document.body.appendChild(overlay);
+
+      document.getElementById('tilt-start-btn').addEventListener('click', () => {
+        DeviceOrientationEvent.requestPermission().then(state => {
+          if (state === 'granted') {
+            overlay.remove();
+            initTiltListener();
+          }
+        }).catch(() => {
+          overlay.remove();
+        });
+      });
     }
 
     function initTiltListener() {
