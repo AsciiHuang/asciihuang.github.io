@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Avatar</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { overflow: hidden; background: #0f0f1a; font-family: system-ui, -apple-system, sans-serif; }
+    canvas { display: block; }
+
+    .controls {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      color: rgba(255,255,255,0.55);
+      font-size: 13px;
+      letter-spacing: 0.02em;
+      pointer-events: none;
+      user-select: none;
+    }
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .key {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 28px;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 5px;
+      background: rgba(255,255,255,0.06);
+      font-size: 15px;
+      color: rgba(255,255,255,0.7);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+    .key.active {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(255,255,255,0.35);
+      color: #fff;
+    }
+    .sep {
+      width: 1px;
+      height: 16px;
+      background: rgba(255,255,255,0.12);
+    }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <div class="control-group">
+      <span class="key" id="key-left">&#x2190;</span>
+      <span>向左轉</span>
+    </div>
+    <div class="sep"></div>
+    <div class="control-group">
+      <span>向右轉</span>
+      <span class="key" id="key-right">&#x2192;</span>
+    </div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.164.1/build/three.module.js"
+    }
+  }
+  </script>
+  <script type="module">
+  import * as THREE from 'three';
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x12121f);
+  scene.fog = new THREE.Fog(0x12121f, 12, 22);
+
+  const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 0.1, 100);
+  camera.position.set(0, 3.2, 9.5);
+  camera.lookAt(0, 2.6, 0);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.1;
+  document.body.appendChild(renderer.domElement);
+
+  // -- Lights --
+  const ambient = new THREE.AmbientLight(0xc8caf0, 0.6);
+  scene.add(ambient);
+
+  const mainLight = new THREE.DirectionalLight(0xfff4e6, 1.2);
+  mainLight.position.set(4, 8, 6);
+  mainLight.castShadow = true;
+  mainLight.shadow.mapSize.set(1024, 1024);
+  mainLight.shadow.camera.near = 1;
+  mainLight.shadow.camera.far = 20;
+  mainLight.shadow.camera.left = -4;
+  mainLight.shadow.camera.right = 4;
+  mainLight.shadow.camera.top = 8;
+  mainLight.shadow.camera.bottom = -1;
+  mainLight.shadow.bias = -0.002;
+  scene.add(mainLight);
+
+  const fillLight = new THREE.DirectionalLight(0x8090c0, 0.4);
+  fillLight.position.set(-3, 4, -2);
+  scene.add(fillLight);
+
+  const rimLight = new THREE.DirectionalLight(0xa0b8ff, 0.35);
+  rimLight.position.set(0, 3, -5);
+  scene.add(rimLight);
+
+  // -- Materials --
+  const skin = new THREE.MeshStandardMaterial({ color: 0xf0cea0, roughness: 0.7, metalness: 0.0 });
+  const hair = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.85 });
+  const shirt = new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: 0.75 });
+  const jeans = new THREE.MeshStandardMaterial({ color: 0x7aaed4, roughness: 0.65 });
+  const shoe = new THREE.MeshStandardMaterial({ color: 0xf0f0f0, roughness: 0.5 });
+  const sole = new THREE.MeshStandardMaterial({ color: 0xb8b8b8, roughness: 0.8 });
+  const glassFr = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.4, metalness: 0.3 });
+  const lens = new THREE.MeshStandardMaterial({ color: 0xd0dce8, roughness: 0.1, metalness: 0.1, transparent: true, opacity: 0.25 });
+  const eyeW = new THREE.MeshStandardMaterial({ color: 0xf5f5f0, roughness: 0.3 });
+  const pupil = new THREE.MeshStandardMaterial({ color: 0x1a1208, roughness: 0.4 });
+  const lip = new THREE.MeshStandardMaterial({ color: 0xc06858, roughness: 0.6 });
+  const cheek = new THREE.MeshStandardMaterial({ color: 0xf0a090, roughness: 0.8, transparent: true, opacity: 0.4 });
+  const brow = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
+  const nbRed = new THREE.MeshStandardMaterial({ color: 0xcc2222, roughness: 0.5 });
+
+  const character = new THREE.Group();
+
+  // -- Head --
+  const headG = new THREE.SphereGeometry(0.85, 40, 32);
+  const headM = new THREE.Mesh(headG, skin);
+  headM.scale.set(1.0, 1.08, 0.92);
+  headM.position.y = 4.85;
+  headM.castShadow = true;
+  character.add(headM);
+
+  // -- Hair base cap --
+  const hairCapG = new THREE.SphereGeometry(0.88, 40, 32, 0, Math.PI * 2, 0, Math.PI * 0.42);
+  const hairCap = new THREE.Mesh(hairCapG, hair);
+  hairCap.position.y = 4.95;
+  hairCap.scale.set(1.03, 1.06, 0.97);
+  hairCap.castShadow = true;
+  character.add(hairCap);
+
+  // fringe / bangs
+  const fringeG = new THREE.BoxGeometry(1.1, 0.12, 0.25);
+  const fringe = new THREE.Mesh(fringeG, hair);
+  fringe.position.set(0, 5.15, 0.55);
+  fringe.rotation.x = 0.15;
+  character.add(fringe);
+
+  // -- Hair spikes --
+  function spike(x, y, z, rx, rz, h, r) {
+    const g = new THREE.ConeGeometry(r || 0.12, h || 0.5, 6);
+    const m = new THREE.Mesh(g, hair);
+    m.position.set(x, y, z);
+    m.rotation.set(rx || 0, 0, rz || 0);
+    m.castShadow = true;
+    return m;
+  }
+
+  const spikes = [
+    spike(0.05, 5.95, -0.05, -0.15, 0.08, 0.7, 0.16),
+    spike(0.3, 5.88, 0.0, -0.1, -0.25, 0.6, 0.14),
+    spike(-0.2, 5.85, 0.05, 0.05, 0.22, 0.6, 0.14),
+    spike(0.45, 5.72, -0.08, -0.12, -0.4, 0.5, 0.13),
+    spike(-0.4, 5.75, -0.05, -0.08, 0.4, 0.55, 0.13),
+    spike(0.15, 5.82, 0.25, 0.3, -0.05, 0.45, 0.12),
+    spike(-0.1, 5.78, 0.3, 0.35, 0.1, 0.4, 0.11),
+    spike(0.55, 5.5, 0.0, 0, -0.65, 0.4, 0.12),
+    spike(-0.55, 5.55, 0.0, 0, 0.6, 0.42, 0.12),
+    spike(0.0, 5.6, -0.55, -0.5, 0, 0.4, 0.13),
+    spike(0.3, 5.5, -0.5, -0.4, -0.2, 0.38, 0.11),
+    spike(-0.25, 5.55, -0.5, -0.42, 0.15, 0.36, 0.11),
+    spike(0.5, 5.6, -0.2, -0.2, -0.5, 0.45, 0.12),
+    spike(-0.48, 5.62, -0.18, -0.18, 0.48, 0.43, 0.12),
+  ];
+  spikes.forEach(s => character.add(s));
+
+  // side hair volume
+  const sideHairG = new THREE.SphereGeometry(0.3, 16, 12);
+  [-1, 1].forEach(side => {
+    const m = new THREE.Mesh(sideHairG, hair);
+    m.position.set(side * 0.72, 5.0, 0.15);
+    m.scale.set(0.55, 0.9, 0.7);
+    m.castShadow = true;
+    character.add(m);
+  });
+
+  // back hair volume
+  const backHairG = new THREE.SphereGeometry(0.7, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.6);
+  const backHair = new THREE.Mesh(backHairG, hair);
+  backHair.position.set(0, 5.1, -0.25);
+  backHair.scale.set(1.1, 1.0, 0.8);
+  backHair.castShadow = true;
+  character.add(backHair);
+
+  // -- Eyebrows (thick) --
+  const browG = new THREE.BoxGeometry(0.3, 0.055, 0.06);
+  [-1, 1].forEach(side => {
+    const b = new THREE.Mesh(browG, brow);
+    b.position.set(side * 0.26, 5.05, 0.76);
+    b.rotation.z = side * -0.12;
+    character.add(b);
+    // vertical lines between brows
+    if (side === -1) {
+      for (let i = 0; i < 3; i++) {
+        const lineG = new THREE.BoxGeometry(0.012, 0.08, 0.01);
+        const line = new THREE.Mesh(lineG, brow);
+        line.position.set(-0.04 + i * 0.04, 5.12, 0.79);
+        character.add(line);
+      }
+    }
+  });
+
+  // -- Eyes --
+  const eyeWG = new THREE.SphereGeometry(0.12, 20, 16);
+  const pupilG = new THREE.SphereGeometry(0.06, 16, 12);
+
+  [-1, 1].forEach(side => {
+    const white = new THREE.Mesh(eyeWG, eyeW);
+    white.position.set(side * 0.26, 4.88, 0.72);
+    white.scale.set(1.1, 0.8, 0.5);
+    character.add(white);
+
+    const p = new THREE.Mesh(pupilG, pupil);
+    p.position.set(side * 0.26, 4.87, 0.78);
+    p.scale.set(1, 0.85, 0.5);
+    character.add(p);
+
+    // eye bags
+    const bagG = new THREE.SphereGeometry(0.08, 12, 8);
+    const bagMat = new THREE.MeshStandardMaterial({ color: 0xd4ad7c, roughness: 0.8, transparent: true, opacity: 0.4 });
+    const bag = new THREE.Mesh(bagG, bagMat);
+    bag.position.set(side * 0.26, 4.78, 0.74);
+    bag.scale.set(1.4, 0.4, 0.3);
+    character.add(bag);
+  });
+
+  // -- Glasses --
+  function frameBar(x, y, z, w, h, d) {
+    const g = new THREE.BoxGeometry(w, h, d);
+    const m = new THREE.Mesh(g, glassFr);
+    m.position.set(x, y, z);
+    return m;
+  }
+
+  const glassesGroup = new THREE.Group();
+  const fw = 0.38, fh = 0.28, ft = 0.028;
+
+  [-1, 1].forEach(side => {
+    const cx = side * 0.26;
+    const cy = 4.88;
+    const cz = 0.76;
+    // top
+    glassesGroup.add(frameBar(cx, cy + fh / 2, cz, fw + ft, ft, ft));
+    // bottom
+    glassesGroup.add(frameBar(cx, cy - fh / 2, cz, fw + ft, ft, ft));
+    // outer
+    glassesGroup.add(frameBar(cx + side * fw / 2, cy, cz, ft, fh, ft));
+    // inner
+    glassesGroup.add(frameBar(cx - side * fw / 2, cy, cz, ft, fh, ft));
+
+    // lens
+    const lensM = new THREE.Mesh(new THREE.PlaneGeometry(fw - ft, fh - ft), lens);
+    lensM.position.set(cx, cy, cz + 0.005);
+    glassesGroup.add(lensM);
+
+    // temple arm
+    const temple = new THREE.Mesh(new THREE.BoxGeometry(0.6, ft, ft), glassFr);
+    temple.position.set(cx + side * 0.38, cy + 0.04, cz - 0.28);
+    temple.rotation.y = side * 0.85;
+    glassesGroup.add(temple);
+  });
+
+  // bridge
+  glassesGroup.add(frameBar(0, 4.91, 0.77, 0.14, ft, ft));
+  character.add(glassesGroup);
+
+  // -- Nose --
+  const noseG = new THREE.SphereGeometry(0.05, 12, 10);
+  const noseM = new THREE.Mesh(noseG, skin);
+  noseM.position.set(0, 4.72, 0.82);
+  noseM.scale.set(0.7, 1.3, 0.7);
+  character.add(noseM);
+
+  // -- Lips --
+  const lipG = new THREE.SphereGeometry(0.1, 16, 12);
+  const lipM = new THREE.Mesh(lipG, lip);
+  lipM.position.set(0, 4.56, 0.72);
+  lipM.scale.set(1.3, 0.5, 0.5);
+  character.add(lipM);
+
+  // -- Cheeks --
+  const cheekG = new THREE.SphereGeometry(0.1, 12, 10);
+  [-1, 1].forEach(side => {
+    const c = new THREE.Mesh(cheekG, cheek);
+    c.position.set(side * 0.48, 4.66, 0.62);
+    c.scale.set(1, 0.6, 0.3);
+    character.add(c);
+  });
+
+  // -- Neck --
+  const neckG = new THREE.CylinderGeometry(0.22, 0.26, 0.35, 16);
+  const neckM = new THREE.Mesh(neckG, skin);
+  neckM.position.y = 3.9;
+  neckM.castShadow = true;
+  character.add(neckM);
+
+  // -- Torso --
+  const torsoG = new THREE.CylinderGeometry(0.62, 0.52, 1.7, 20);
+  const torsoM = new THREE.Mesh(torsoG, shirt);
+  torsoM.position.y = 2.9;
+  torsoM.castShadow = true;
+  character.add(torsoM);
+
+  // shirt collar
+  const collarG = new THREE.TorusGeometry(0.28, 0.04, 8, 24, Math.PI);
+  const collar = new THREE.Mesh(collarG, shirt);
+  collar.position.set(0, 3.72, 0.15);
+  collar.rotation.x = -0.3;
+  character.add(collar);
+
+  // -- Arms --
+  [-1, 1].forEach(side => {
+    // upper arm (shirt)
+    const upperG = new THREE.CylinderGeometry(0.15, 0.14, 0.85, 12);
+    const upper = new THREE.Mesh(upperG, shirt);
+    upper.position.set(side * 0.78, 3.3, 0);
+    upper.rotation.z = side * 0.12;
+    upper.castShadow = true;
+    character.add(upper);
+
+    // short sleeve end
+    const sleeveG = new THREE.CylinderGeometry(0.16, 0.14, 0.12, 12);
+    const sleeve = new THREE.Mesh(sleeveG, shirt);
+    sleeve.position.set(side * 0.8, 2.85, 0);
+    sleeve.castShadow = true;
+    character.add(sleeve);
+
+    // forearm (skin)
+    const foreG = new THREE.CylinderGeometry(0.12, 0.1, 0.7, 12);
+    const fore = new THREE.Mesh(foreG, skin);
+    fore.position.set(side * 0.82, 2.45, 0);
+    fore.castShadow = true;
+    character.add(fore);
+
+    // hand
+    const handG = new THREE.SphereGeometry(0.1, 12, 10);
+    const hand = new THREE.Mesh(handG, skin);
+    hand.position.set(side * 0.82, 2.05, 0);
+    hand.castShadow = true;
+    character.add(hand);
+  });
+
+  // -- Legs (jeans) --
+  [-1, 1].forEach(side => {
+    // upper leg
+    const upperLG = new THREE.CylinderGeometry(0.22, 0.2, 0.9, 14);
+    const upperL = new THREE.Mesh(upperLG, jeans);
+    upperL.position.set(side * 0.22, 1.6, 0);
+    upperL.castShadow = true;
+    character.add(upperL);
+
+    // lower leg
+    const lowerLG = new THREE.CylinderGeometry(0.19, 0.17, 0.85, 14);
+    const lowerL = new THREE.Mesh(lowerLG, jeans);
+    lowerL.position.set(side * 0.22, 0.75, 0);
+    lowerL.castShadow = true;
+    character.add(lowerL);
+  });
+
+  // -- Belt --
+  const beltG = new THREE.CylinderGeometry(0.53, 0.53, 0.08, 20);
+  const beltMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.6 });
+  const belt = new THREE.Mesh(beltG, beltMat);
+  belt.position.y = 2.06;
+  character.add(belt);
+
+  // belt buckle
+  const buckleG = new THREE.BoxGeometry(0.08, 0.08, 0.03);
+  const buckleMat = new THREE.MeshStandardMaterial({ color: 0xb0a080, roughness: 0.3, metalness: 0.6 });
+  const buckle = new THREE.Mesh(buckleG, buckleMat);
+  buckle.position.set(0, 2.06, 0.53);
+  character.add(buckle);
+
+  // -- Shoes (white New Balance) --
+  [-1, 1].forEach(side => {
+    const shoeGroup = new THREE.Group();
+
+    // main shoe body
+    const bodyG = new THREE.BoxGeometry(0.28, 0.16, 0.42);
+    const body = new THREE.Mesh(bodyG, shoe);
+    body.position.set(0, 0.08, 0.04);
+    body.castShadow = true;
+    shoeGroup.add(body);
+
+    // toe cap (rounded front)
+    const toeG = new THREE.SphereGeometry(0.14, 16, 12, 0, Math.PI, 0, Math.PI / 2);
+    const toe = new THREE.Mesh(toeG, shoe);
+    toe.position.set(0, 0.0, 0.24);
+    toe.rotation.x = -Math.PI / 2;
+    shoeGroup.add(toe);
+
+    // sole
+    const soleG = new THREE.BoxGeometry(0.3, 0.05, 0.46);
+    const soleM = new THREE.Mesh(soleG, sole);
+    soleM.position.set(0, -0.03, 0.04);
+    shoeGroup.add(soleM);
+
+    // ankle collar
+    const ankleG = new THREE.CylinderGeometry(0.12, 0.14, 0.08, 12);
+    const ankle = new THREE.Mesh(ankleG, shoe);
+    ankle.position.set(0, 0.2, -0.06);
+    shoeGroup.add(ankle);
+
+    // "N" logo on outer side
+    const nGroup = new THREE.Group();
+    // diagonal of N
+    const diagG = new THREE.BoxGeometry(0.015, 0.1, 0.012);
+    const diag = new THREE.Mesh(diagG, nbRed);
+    diag.rotation.z = 0.5 * side;
+    nGroup.add(diag);
+    // left vertical
+    const lv = new THREE.Mesh(new THREE.BoxGeometry(0.015, 0.08, 0.012), nbRed);
+    lv.position.set(-0.035, 0, 0);
+    nGroup.add(lv);
+    // right vertical
+    const rv = new THREE.Mesh(new THREE.BoxGeometry(0.015, 0.08, 0.012), nbRed);
+    rv.position.set(0.035, 0, 0);
+    nGroup.add(rv);
+
+    nGroup.position.set(side * 0.145, 0.1, 0.04);
+    nGroup.rotation.y = side * Math.PI / 2;
+    shoeGroup.add(nGroup);
+
+    shoeGroup.position.set(side * 0.22, 0.28, 0);
+    character.add(shoeGroup);
+  });
+
+  scene.add(character);
+
+  // -- Ground --
+  const groundG = new THREE.CircleGeometry(4, 64);
+  const groundMat = new THREE.MeshStandardMaterial({ color: 0x1e1e30, roughness: 0.9 });
+  const ground = new THREE.Mesh(groundG, groundMat);
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = 0.15;
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  // shadow blob under character
+  const shadowG = new THREE.CircleGeometry(0.6, 32);
+  const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.25 });
+  const shadow = new THREE.Mesh(shadowG, shadowMat);
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.position.y = 0.16;
+  scene.add(shadow);
+
+  // -- Rotation Control --
+  let rotVel = 0;
+  const accel = 0.004;
+  const maxSpeed = 0.04;
+  const friction = 0.92;
+  const keys = { left: false, right: false };
+
+  const keyLeft = document.getElementById('key-left');
+  const keyRight = document.getElementById('key-right');
+
+  window.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft') { keys.left = true; keyLeft.classList.add('active'); }
+    if (e.key === 'ArrowRight') { keys.right = true; keyRight.classList.add('active'); }
+  });
+  window.addEventListener('keyup', e => {
+    if (e.key === 'ArrowLeft') { keys.left = false; keyLeft.classList.remove('active'); }
+    if (e.key === 'ArrowRight') { keys.right = false; keyRight.classList.remove('active'); }
+  });
+
+  // gentle idle sway
+  let time = 0;
+
+  function animate() {
+    requestAnimationFrame(animate);
+    time += 0.016;
+
+    if (keys.left) rotVel = Math.min(rotVel + accel, maxSpeed);
+    else if (keys.right) rotVel = Math.max(rotVel - accel, -maxSpeed);
+    else rotVel *= friction;
+
+    character.rotation.y += rotVel;
+
+    // subtle idle breathing
+    const breathe = Math.sin(time * 1.8) * 0.003;
+    character.position.y = breathe;
+
+    renderer.render(scene, camera);
+  }
+
+  animate();
+
+  window.addEventListener('resize', () => {
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+  });
+  </script>
+</body>
+</html>
